@@ -42,3 +42,5 @@ Github Search App is an application written by considering MVVM architecture, Cl
 - [Hilt](https://developer.android.com/training/dependency-injection/hilt-android) is a dependency injection library for Android
 - [Gson](https://github.com/google/gson) Google Gson is of libraries for handling JSON objects
 - [Room DB](https://developer.android.com/training/data-storage/room) - The Room persistence library provides an abstraction layer over SQLite to allow fluent database access while harnessing the full power of SQLite
+
+#In this project, there is a testable example of State and Event structure.
