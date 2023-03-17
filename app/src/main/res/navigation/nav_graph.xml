@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <dialog
+        android:id="@+id/infoFragment"
+        android:name="com.mehmetpetek.githubsample.ui.info.InfoFragment"
+        tools:layout="@layout/fragment_info">
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="desc"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="buttonPrimary"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="buttonSecondary"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="cancellable"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <argument
+            android:name="iconId"
+            app:argType="reference" />
+    </dialog>
+
+    <action
+        android:id="@+id/global_to_root"
+        app:destination="@id/homeFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/global_to_info"
+        app:destination="@id/infoFragment" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.mehmetpetek.githubsample.ui.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/homeFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userDetailFragment"
+        android:name="com.mehmetpetek.githubsample.ui.userdetail.UserDetailFragment"
+        android:label="fragment_user_detail"
+        tools:layout="@layout/fragment_user_detail">
+        <argument
+            android:name="login"
+            app:argType="string" />
+    </fragment>
+</navigation>

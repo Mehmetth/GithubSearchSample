@@ -1,0 +1,22 @@
+<resources>
+    <string name="error">Error</string>
+    <string name="explanation">Explanation</string>
+    <string name="ok">OK</string>
+    <string name="no_internet">No Internet</string>
+    <string name="general_error">General Error Occurred</string>
+    <string name="try_exception_mesage">Trying to call an auto-cleared value outside of the view lifecycle.</string>
+
+    <string name="search_users">Search</string>
+    <string name="found_users_count">Number of people found: </string>
+    <string name="search_pls">Search to see results</string>
+    <string name="not_found">Not Found</string>
+
+    <string name="company">Company: </string>
+    <string name="location">Location: </string>
+    <string name="email">Email: </string>
+    <string name="bio">Bio: </string>
+    <string name="twitter_username">Twitter Username: </string>
+    <string name="followers">Followers: </string>
+    <string name="following">Following: </string>
+    <string name="created_at">"Created At: </string>
+</resources>
