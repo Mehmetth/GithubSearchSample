@@ -6,4 +6,5 @@ sealed class HomeEvent : Event {
     class SearchUser(val userName: String) : HomeEvent()
     class GoToUserDetail(val login: String) : HomeEvent()
     class ClickFavorite(val index: Int, val id: Int) : HomeEvent()
+    object LoadMore : HomeEvent()
 }

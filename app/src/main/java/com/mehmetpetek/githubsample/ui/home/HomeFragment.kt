@@ -4,6 +4,7 @@ import android.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mehmetpetek.githubsample.R
 import com.mehmetpetek.githubsample.common.extensions.gone
@@ -12,6 +13,7 @@ import com.mehmetpetek.githubsample.common.extensions.visible
 import com.mehmetpetek.githubsample.data.remote.model.Users
 import com.mehmetpetek.githubsample.databinding.FragmentHomeBinding
 import com.mehmetpetek.githubsample.ui.base.BaseFragment
+import com.mehmetpetek.githubsample.ui.common.PaginationScrollListener
 import com.mehmetpetek.githubsample.ui.home.adapter.UsersAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,8 +46,12 @@ class HomeFragment :
             viewModel.state.collect {
                 setLoadingState(it.isLoading)
 
-                setTotalCount(it.totalCount ?: 0)
-                setList(it.usersList, it.changeIconIndex)
+                if (!it.isLoading) {
+                    it.totalCount?.let { totalCount ->
+                        setTotalCount(totalCount)
+                        setList(totalCount, it.usersList, it.changeIconIndex)
+                    }
+                }
             }
         }
     }
@@ -64,6 +70,10 @@ class HomeFragment :
                     binding.rvUsers.adapter = null
                     binding.rvUsers.gone()
                 } else if (msg.length > 2) {
+                    if (binding.rvUsers.adapter != null) {
+                        binding.rvUsers.adapter = null
+                        binding.rvUsers.gone()
+                    }
                     viewModel.setEvent(
                         HomeEvent.SearchUser(
                             msg
@@ -79,7 +89,7 @@ class HomeFragment :
         binding.tvResultCount.text = "${getString(R.string.found_users_count)} $count"
     }
 
-    private fun setList(userList: List<Users>?, index: Int) {
+    private fun setList(resultTotalCount: Int, userList: List<Users>?, index: Int) {
         userList?.let {
             binding.rvUsers.visible()
             binding.tvNotFound.gone()
@@ -93,10 +103,29 @@ class HomeFragment :
                 adapter.stateRestorationPolicy =
                     RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 binding.rvUsers.adapter = adapter
-                binding.rvUsers.adapter = adapter
+                binding.rvUsers.addOnScrollListener(object :
+                    PaginationScrollListener(binding.rvUsers.layoutManager as LinearLayoutManager) {
+                    override fun loadMoreItems() {
+                        viewModel.setEvent(HomeEvent.LoadMore)
+                    }
+
+                    override fun isLastPage(): Boolean =
+                        (binding.rvUsers.adapter as UsersAdapter).itemCount >= (resultTotalCount)
+
+                    override fun isLoading(): Boolean = isLoadingVisible()
+                    override fun isLastedPage() {}
+                    override fun isNotLastedPage() {}
+                })
             } else {
-                (binding.rvUsers.adapter as UsersAdapter).notifyItemChanged(index)
-                (binding.rvUsers.adapter as UsersAdapter).submitList(userList)
+                if (index == -1) {
+                    val currentList =
+                        (binding.rvUsers.adapter as UsersAdapter).currentList.distinct()
+                            .toMutableList()
+                    currentList.addAll(userList)
+                    (binding.rvUsers.adapter as UsersAdapter).submitList(currentList)
+                } else {
+                    (binding.rvUsers.adapter as UsersAdapter).notifyItemChanged(index)
+                }
             }
 
             if (it.isEmpty()) {

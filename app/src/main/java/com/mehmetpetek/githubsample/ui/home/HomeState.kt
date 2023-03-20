@@ -9,5 +9,6 @@ data class HomeState(
     val totalCount: Int? = null,
     val usersList: List<Users>? = null,
     val isSame: Boolean = false,
-    val changeIconIndex: Int = 0,
+    val changeIconIndex: Int = -1,
+    val page: Int = 1,
 ) : State

@@ -14,10 +14,10 @@ class UsersUseCase @Inject constructor(
     private val githubRepository: GithubRepository,
     private val githubUserDBRepository: GithubUserDBRepository,
 ) {
-    operator fun invoke(query: String): Flow<UsersState> =
+    operator fun invoke(query: String, page: String): Flow<UsersState> =
         callbackFlow {
             val allUsers = githubUserDBRepository.getAllUsers()
-            githubRepository.search(query).collect { result ->
+            githubRepository.search(query, page).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         result.data?.items?.forEach { user ->

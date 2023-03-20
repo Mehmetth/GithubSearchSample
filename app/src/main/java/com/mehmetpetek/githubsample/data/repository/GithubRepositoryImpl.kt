@@ -15,10 +15,10 @@ class GithubRepositoryImpl @Inject constructor(private val retrofitDataSource: R
     GithubRepository {
 
     override fun search(
-        query: String
+        query: String, page: String
     ): Flow<Resource<SearchResponse>> =
         callbackFlow {
-            val response = retrofitDataSource.search(query)
+            val response = retrofitDataSource.search(query, page)
             if (response.isSuccessful) {
                 response.body()?.let {
                     trySend(Resource.Success(it))

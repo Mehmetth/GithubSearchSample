@@ -11,7 +11,8 @@ interface GithubService {
 
     @GET("search/users")
     suspend fun search(
-        @Query("q") query: String
+        @Query("q") query: String,
+        @Query("page") page: String
     ): Response<SearchResponse>
 
     @GET("users/{login}")

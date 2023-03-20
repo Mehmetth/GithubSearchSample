@@ -21,7 +21,7 @@ class HomeViewModel @Inject constructor(
     override fun handleEvents(event: HomeEvent) {
         when (event) {
             is HomeEvent.SearchUser -> {
-                getUsers(event.userName)
+                getUsers(event.userName, 1)
             }
             is HomeEvent.GoToUserDetail -> {
                 setEffect { HomeEffect.GoToUserDetail(event.login) }
@@ -29,14 +29,17 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ClickFavorite -> {
                 changeFavoriteIcon(event.index, event.id)
             }
+            is HomeEvent.LoadMore -> {
+                getUsers(getCurrentState().searchQuery, getCurrentState().page + 1)
+            }
         }
     }
 
     @VisibleForTesting
-    fun getUsers(userName: String) {
+    fun getUsers(userName: String, page: Int) {
         setState { getCurrentState().copy(isLoading = true) }
         viewModelScope.launch {
-            usersUseCase.invoke(userName).collect {
+            usersUseCase.invoke(userName, page = page.toString()).collect {
                 when (it) {
                     is UsersUseCase.UsersState.Success -> {
                         setState {
@@ -44,7 +47,8 @@ class HomeViewModel @Inject constructor(
                                 isLoading = false,
                                 totalCount = it.searchResponse?.total_count,
                                 usersList = it.searchResponse?.items,
-                                searchQuery = userName
+                                searchQuery = userName,
+                                page = page
                             )
                         }
                     }
