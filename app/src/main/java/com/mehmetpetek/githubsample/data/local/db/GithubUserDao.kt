@@ -5,18 +5,19 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.mehmetpetek.githubsample.data.local.model.GithubUser
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GithubUserDao {
     @Query("SELECT * FROM githubuser ")
-    suspend fun getAllUsers(): List<GithubUser>
+    fun getAllUsers(): Flow<List<GithubUser>>
 
     @Query("SELECT * FROM githubuser WHERE userId = :userId")
-    suspend fun geGithubUsers(userId: Int): GithubUser?
+    fun geGithubUsers(userId: Int): Flow<GithubUser?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertGithubUser(githubUser: GithubUser)
+    fun insertGithubUser(githubUser: GithubUser)
 
     @Query("DELETE FROM githubuser WHERE userId = :userId")
-    suspend fun deleteGithubUser(userId: Int)
+    fun deleteGithubUser(userId: Int)
 }

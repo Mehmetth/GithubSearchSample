@@ -1,18 +1,14 @@
 package com.mehmetpetek.githubsample.domain.repository
 
-import com.mehmetpetek.githubsample.data.local.db.GithubUserDao
 import com.mehmetpetek.githubsample.data.local.model.GithubUser
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
-class GithubUserDBRepository @Inject constructor(
-    private val dao: GithubUserDao,
-) {
-    suspend fun getAllUsers() = dao.getAllUsers()
+interface GithubUserDBRepository {
+    suspend fun getAllUsers(): Flow<List<GithubUser>>
 
-    suspend fun insertGithubUser(githubUser: GithubUser) =
-        dao.insertGithubUser(githubUser)
+    suspend fun geGithubUsers(userId: Int): Flow<GithubUser?>
 
-    suspend fun getGithubUser(userId: Int): GithubUser? = dao.geGithubUsers(userId)
+    suspend fun insertGithubUser(githubUser: GithubUser)
 
-    suspend fun deleteGithubUser(userId: Int) = dao.deleteGithubUser(userId)
+    suspend fun deleteGithubUser(userId: Int)
 }

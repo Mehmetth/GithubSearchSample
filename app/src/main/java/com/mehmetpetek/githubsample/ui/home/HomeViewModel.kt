@@ -89,10 +89,12 @@ class HomeViewModel @Inject constructor(
 
     private fun changeDBFavorite(id: Int) {
         viewModelScope.launch {
-            if (githubUserDBRepository.getGithubUser(id) == null) {
-                githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
-            } else {
-                githubUserDBRepository.deleteGithubUser(id)
+            githubUserDBRepository.geGithubUsers(id).collect {
+                if (it == null) {
+                    githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
+                } else {
+                    githubUserDBRepository.deleteGithubUser(id)
+                }
             }
         }
     }

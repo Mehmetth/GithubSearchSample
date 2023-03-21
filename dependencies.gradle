@@ -25,7 +25,7 @@ ext {
             roudableLayout : '1.1.4',
             tinkoff        : '1.2.3',
             photoView      : '2.3.0',
-            room           : '2.4.0-alpha04',
+            room           : '2.4.2',
 
             junit            : '4.13.2',
             mockk            : '1.13.3',

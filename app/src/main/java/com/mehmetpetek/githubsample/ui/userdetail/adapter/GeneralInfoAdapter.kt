@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mehmetpetek.githubsample.data.local.model.GeneralInfoModel
 import com.mehmetpetek.githubsample.databinding.RvRepoItemBinding
 
-class GeneralInfoAdapter(
-) : ListAdapter<GeneralInfoModel, GeneralInfoAdapter.GeneralInfoViewHolder>(GeneralInfoDiffUtil()) {
+class GeneralInfoAdapter : ListAdapter<GeneralInfoModel, GeneralInfoAdapter.GeneralInfoViewHolder>(GeneralInfoDiffUtil()) {
 
     class GeneralInfoDiffUtil : DiffUtil.ItemCallback<GeneralInfoModel>() {
         override fun areItemsTheSame(oldItem: GeneralInfoModel, newItem: GeneralInfoModel) =

@@ -116,9 +116,9 @@ dependencies {
     implementation "com.github.chuckerteam.chucker:library:$versions.chucker"
 
     //Room components
-    implementation "androidx.room:room-ktx:$versions.room"
+    implementation "androidx.room:room-runtime:$versions.room"
     kapt "androidx.room:room-compiler:$versions.room"
-    androidTestImplementation "androidx.room:room-testing:$versions.room"
+    implementation "androidx.room:room-ktx:$versions.room"
 
     //Unit Test
     testImplementation "junit:junit:$versions.junit"

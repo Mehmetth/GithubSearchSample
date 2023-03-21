@@ -8,6 +8,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class UsersUseCase @Inject constructor(
@@ -16,28 +17,29 @@ class UsersUseCase @Inject constructor(
 ) {
     operator fun invoke(query: String, page: String): Flow<UsersState> =
         callbackFlow {
-            val allUsers = githubUserDBRepository.getAllUsers()
-            githubRepository.search(query, page).collect { result ->
-                when (result) {
+            val users = githubRepository.search(query, page)
+            val dbUsers = githubUserDBRepository.getAllUsers()
+
+            users.combine(dbUsers) { _users, _dbUsers ->
+                when (_users) {
                     is Resource.Success -> {
-                        result.data?.items?.forEach { user ->
-                            user.favorite = allUsers.find { it.userId == user.id } != null
+                        _users.data?.items?.forEach { user ->
+                            user.favorite = _dbUsers.find { it.userId == user.id } != null
                         }
-                        if (result.data?.items?.isEmpty() == true) {
-                            trySend(
-                                UsersState.NotFoundUsers
-                            )
+                        if (_users.data?.items?.isEmpty() == true) {
+                            UsersState.NotFoundUsers
+
                         } else {
-                            trySend(
-                                UsersState.Success(result.data)
-                            )
+                            UsersState.Success(_users.data)
                         }
                     }
                     is Resource.Error,
                     is Resource.Fail -> {
-                        trySend(UsersState.Error(result.message))
+                        UsersState.Error(_users.message)
                     }
                 }
+            }.collect {
+                trySend(it)
             }
             awaitClose { cancel() }
         }

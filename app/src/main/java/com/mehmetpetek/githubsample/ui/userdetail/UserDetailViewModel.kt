@@ -59,13 +59,15 @@ class UserDetailViewModel @Inject constructor(
     private fun setFavFavoriteIcon() {
         viewModelScope.launch {
             getCurrentState().userDetailResponse?.id?.let {
-                if (githubUserDBRepository.getGithubUser(it) == null) {
-                    setState {
-                        getCurrentState().copy(isFav = false)
-                    }
-                } else {
-                    setState {
-                        getCurrentState().copy(isFav = true)
+                githubUserDBRepository.geGithubUsers(it).collect { githubUsers ->
+                    if (githubUsers == null) {
+                        setState {
+                            getCurrentState().copy(isFav = false)
+                        }
+                    } else {
+                        setState {
+                            getCurrentState().copy(isFav = true)
+                        }
                     }
                 }
             }
@@ -75,15 +77,17 @@ class UserDetailViewModel @Inject constructor(
     private fun clickFavorite() {
         viewModelScope.launch {
             getCurrentState().userDetailResponse?.id?.let {
-                if (githubUserDBRepository.getGithubUser(it) == null) {
-                    githubUserDBRepository.insertGithubUser(GithubUser(userId = it))
-                    setState {
-                        getCurrentState().copy(isFav = true)
-                    }
-                } else {
-                    githubUserDBRepository.deleteGithubUser(it)
-                    setState {
-                        getCurrentState().copy(isFav = false)
+                githubUserDBRepository.geGithubUsers(it).collect { githubUsers ->
+                    if (githubUsers == null) {
+                        githubUserDBRepository.insertGithubUser(GithubUser(userId = it))
+                        setState {
+                            getCurrentState().copy(isFav = true)
+                        }
+                    } else {
+                        githubUserDBRepository.deleteGithubUser(it)
+                        setState {
+                            getCurrentState().copy(isFav = false)
+                        }
                     }
                 }
             }
