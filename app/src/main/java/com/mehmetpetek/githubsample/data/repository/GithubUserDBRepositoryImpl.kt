@@ -9,8 +9,8 @@ class GithubUserDBRepositoryImpl @Inject constructor(
     private val dao: GithubUserDao,
 ) : GithubUserDBRepository {
 
-    override suspend fun getAllUsers() = dao.getAllUsers()
-    override suspend fun geGithubUsers(userId: Int) = dao.geGithubUsers(userId)
+    override fun getAllUsers() = dao.getAllUsers()
+    override fun geGithubUsers(userId: Int) = dao.geGithubUsers(userId)
     override suspend fun insertGithubUser(githubUser: GithubUser) =
         dao.insertGithubUser(githubUser)
 

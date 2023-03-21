@@ -21,7 +21,13 @@ class UserDetailFragment :
 
     override fun bindScreen() {
         lifecycleScope.launchWhenResumed {
-            viewModel.effect.collect {}
+            viewModel.effect.collect {
+                when (it) {
+                    is UserDetailEffect.ShowError -> {
+                        handleError(it.throwable)
+                    }
+                }
+            }
         }
 
         lifecycleScope.launchWhenResumed {

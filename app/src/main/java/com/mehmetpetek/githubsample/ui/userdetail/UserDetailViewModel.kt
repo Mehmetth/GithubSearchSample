@@ -8,6 +8,8 @@ import com.mehmetpetek.githubsample.domain.repository.GithubUserDBRepository
 import com.mehmetpetek.githubsample.domain.usecase.UserDetailUseCase
 import com.mehmetpetek.githubsample.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,39 +59,37 @@ class UserDetailViewModel @Inject constructor(
     }
 
     private fun setFavFavoriteIcon() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getCurrentState().userDetailResponse?.id?.let {
-                githubUserDBRepository.geGithubUsers(it).collect { githubUsers ->
-                    if (githubUsers == null) {
-                        setState {
-                            getCurrentState().copy(isFav = false)
-                        }
-                    } else {
-                        setState {
-                            getCurrentState().copy(isFav = true)
-                        }
-                    }
+                if (githubUserDBRepository.geGithubUsers(it).first() == null) {
+                    setState { getCurrentState().copy(isFav = false) }
+                } else {
+                    setState { getCurrentState().copy(isFav = true) }
                 }
             }
         }
     }
 
     private fun clickFavorite() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getCurrentState().userDetailResponse?.id?.let {
-                githubUserDBRepository.geGithubUsers(it).collect { githubUsers ->
-                    if (githubUsers == null) {
-                        githubUserDBRepository.insertGithubUser(GithubUser(userId = it))
-                        setState {
-                            getCurrentState().copy(isFav = true)
-                        }
-                    } else {
-                        githubUserDBRepository.deleteGithubUser(it)
-                        setState {
-                            getCurrentState().copy(isFav = false)
-                        }
-                    }
+                if (githubUserDBRepository.geGithubUsers(it).first() == null) {
+                    setState { getCurrentState().copy(isFav = true) }
+                    changeUserDB(true, it)
+                } else {
+                    setState { getCurrentState().copy(isFav = false) }
+                    changeUserDB(false, it)
                 }
+            }
+        }
+    }
+
+    private fun changeUserDB(value: Boolean, id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (value) {
+                githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
+            } else {
+                githubUserDBRepository.deleteGithubUser(id)
             }
         }
     }

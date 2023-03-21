@@ -7,6 +7,8 @@ import com.mehmetpetek.githubsample.domain.repository.GithubUserDBRepository
 import com.mehmetpetek.githubsample.domain.usecase.UsersUseCase
 import com.mehmetpetek.githubsample.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -88,13 +90,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun changeDBFavorite(id: Int) {
-        viewModelScope.launch {
-            githubUserDBRepository.geGithubUsers(id).collect {
-                if (it == null) {
-                    githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
-                } else {
-                    githubUserDBRepository.deleteGithubUser(id)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (githubUserDBRepository.geGithubUsers(id).first() == null) {
+                githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
+            } else {
+                githubUserDBRepository.deleteGithubUser(id)
             }
         }
     }
