@@ -20,7 +20,9 @@ class HomeViewModel @Inject constructor(
     override fun handleEvents(event: HomeEvent) {
         when (event) {
             is HomeEvent.SearchUser -> {
-                getUsers(event.userName, 1)
+                //If the user goes to the detail page and comes back, the request is made to continue from where it left off.
+                if (getCurrentState().searchQuery != event.userName)
+                    getUsers(event.userName, 1)
             }
             is HomeEvent.GoToUserDetail -> {
                 setEffect { HomeEffect.GoToUserDetail(event.login) }
