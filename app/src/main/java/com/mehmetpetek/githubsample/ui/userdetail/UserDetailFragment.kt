@@ -1,7 +1,9 @@
 package com.mehmetpetek.githubsample.ui.userdetail
 
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.mehmetpetek.githubsample.R
 import com.mehmetpetek.githubsample.common.extensions.ScaleType
 import com.mehmetpetek.githubsample.common.extensions.setImage
@@ -12,6 +14,7 @@ import com.mehmetpetek.githubsample.databinding.FragmentUserDetailBinding
 import com.mehmetpetek.githubsample.ui.base.BaseFragment
 import com.mehmetpetek.githubsample.ui.userdetail.adapter.GeneralInfoAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserDetailFragment :
@@ -20,24 +23,35 @@ class UserDetailFragment :
     private val viewModel by viewModels<UserDetailViewModel>()
 
     override fun bindScreen() {
-        lifecycleScope.launchWhenResumed {
-            viewModel.effect.collect {
-                when (it) {
-                    is UserDetailEffect.ShowError -> {
-                        handleError(it.throwable)
+        getEffect()
+        getState()
+    }
+
+    private fun getEffect() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.effect.collect {
+                    when (it) {
+                        is UserDetailEffect.ShowError -> {
+                            handleError(it.throwable)
+                        }
                     }
                 }
             }
         }
+    }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.state.collect {
-                setLoadingState(it.isLoading)
-                setFavIcon(it.isFav)
-                setUserProperties(it.userDetailResponse)
+    private fun getState() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    setLoadingState(it.isLoading)
+                    setFavIcon(it.isFav)
+                    setUserProperties(it.userDetailResponse)
 
-                binding.ivFavIcon.setOnClickListener {
-                    viewModel.setEvent(UserDetailEvent.ClickFavorite)
+                    binding.ivFavIcon.setOnClickListener {
+                        viewModel.setEvent(UserDetailEvent.ClickFavorite)
+                    }
                 }
             }
         }

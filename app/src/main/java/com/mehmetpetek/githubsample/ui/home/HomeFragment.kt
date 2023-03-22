@@ -2,7 +2,9 @@ package com.mehmetpetek.githubsample.ui.home
 
 import android.widget.SearchView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +18,7 @@ import com.mehmetpetek.githubsample.ui.base.BaseFragment
 import com.mehmetpetek.githubsample.ui.common.PaginationScrollListener
 import com.mehmetpetek.githubsample.ui.home.adapter.UsersAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment :
@@ -27,29 +30,40 @@ class HomeFragment :
     override fun bindScreen() {
         setSearchView()
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.effect.collect {
-                when (it) {
-                    is HomeEffect.ShowError -> {
-                        handleError(it.throwable)
-                    }
-                    is HomeEffect.GoToUserDetail -> {
-                        findNavController().navigateSafe(
-                            HomeFragmentDirections.homeFragmentToUserDetailFragment(it.login)
-                        )
+        getEffect()
+        getState()
+    }
+
+    private fun getEffect() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.effect.collect {
+                    when (it) {
+                        is HomeEffect.ShowError -> {
+                            handleError(it.throwable)
+                        }
+                        is HomeEffect.GoToUserDetail -> {
+                            findNavController().navigateSafe(
+                                HomeFragmentDirections.homeFragmentToUserDetailFragment(it.login)
+                            )
+                        }
                     }
                 }
             }
         }
+    }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.state.collect {
-                setLoadingState(it.isLoading)
+    private fun getState() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    setLoadingState(it.isLoading)
 
-                if (!it.isLoading) {
-                    it.totalCount?.let { totalCount ->
-                        setTotalCount(totalCount)
-                        setList(totalCount, it.usersList, it.changeIconIndex)
+                    if (!it.isLoading) {
+                        it.totalCount?.let { totalCount ->
+                            setTotalCount(totalCount)
+                            setList(totalCount, it.usersList, it.changeIconIndex)
+                        }
                     }
                 }
             }
