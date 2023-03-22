@@ -3,7 +3,6 @@ package com.mehmetpetek.githubsample.ui.userdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.mehmetpetek.githubsample.common.Constant
-import com.mehmetpetek.githubsample.data.local.model.GithubUser
 import com.mehmetpetek.githubsample.domain.repository.GithubUserDBRepository
 import com.mehmetpetek.githubsample.domain.usecase.UserDetailUseCase
 import com.mehmetpetek.githubsample.ui.base.BaseViewModel
@@ -61,10 +60,10 @@ class UserDetailViewModel @Inject constructor(
     private fun setFavFavoriteIcon() {
         viewModelScope.launch(Dispatchers.IO) {
             getCurrentState().userDetailResponse?.id?.let {
-                if (githubUserDBRepository.geGithubUsers(it).first() == null) {
-                    setState { getCurrentState().copy(isFav = false) }
-                } else {
+                if (githubUserDBRepository.getGithubUser(it).first()?.isFav == true) {
                     setState { getCurrentState().copy(isFav = true) }
+                } else {
+                    setState { getCurrentState().copy(isFav = false) }
                 }
             }
         }
@@ -73,24 +72,20 @@ class UserDetailViewModel @Inject constructor(
     private fun clickFavorite() {
         viewModelScope.launch(Dispatchers.IO) {
             getCurrentState().userDetailResponse?.id?.let {
-                if (githubUserDBRepository.geGithubUsers(it).first() == null) {
-                    setState { getCurrentState().copy(isFav = true) }
-                    changeUserDB(true, it)
-                } else {
+                if (githubUserDBRepository.getGithubUser(it).first()?.isFav == true) {
                     setState { getCurrentState().copy(isFav = false) }
-                    changeUserDB(false, it)
+                    changeDBFavorite(it)
+                } else {
+                    setState { getCurrentState().copy(isFav = true) }
+                    changeDBFavorite(it)
                 }
             }
         }
     }
 
-    private fun changeUserDB(value: Boolean, id: Int) {
+    private fun changeDBFavorite(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (value) {
-                githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
-            } else {
-                githubUserDBRepository.deleteGithubUser(id)
-            }
+            githubUserDBRepository.updateGithubUser(id)
         }
     }
 }

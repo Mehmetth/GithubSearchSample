@@ -10,5 +10,6 @@ import kotlinx.parcelize.Parcelize
 data class GithubUser(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    var userId: Int
+    var userId: Int,
+    var isFav: Boolean = false
 ) : Parcelable

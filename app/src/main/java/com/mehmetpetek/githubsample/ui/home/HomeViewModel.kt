@@ -1,14 +1,11 @@
 package com.mehmetpetek.githubsample.ui.home
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
-import com.mehmetpetek.githubsample.data.local.model.GithubUser
 import com.mehmetpetek.githubsample.domain.repository.GithubUserDBRepository
 import com.mehmetpetek.githubsample.domain.usecase.UsersUseCase
 import com.mehmetpetek.githubsample.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,8 +34,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    @VisibleForTesting
-    fun getUsers(userName: String, page: Int) {
+    private fun getUsers(userName: String, page: Int) {
         setState { getCurrentState().copy(isLoading = true) }
         viewModelScope.launch {
             usersUseCase.invoke(userName, page = page.toString()).collect {
@@ -76,9 +72,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun changeFavoriteIcon(index: Int, id: Int) {
-        val currentFavorite = getCurrentState().usersList?.find { it.id == id }?.favorite
-        getCurrentState().usersList?.find { it.id == id }?.favorite = !(currentFavorite ?: false)
-
         changeDBFavorite(id)
         setState {
             getCurrentState().copy(
@@ -91,11 +84,7 @@ class HomeViewModel @Inject constructor(
 
     private fun changeDBFavorite(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (githubUserDBRepository.geGithubUsers(id).first() == null) {
-                githubUserDBRepository.insertGithubUser(GithubUser(userId = id))
-            } else {
-                githubUserDBRepository.deleteGithubUser(id)
-            }
+            githubUserDBRepository.updateGithubUser(id)
         }
     }
 }

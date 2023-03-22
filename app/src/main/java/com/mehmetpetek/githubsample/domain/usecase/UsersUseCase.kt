@@ -18,13 +18,15 @@ class UsersUseCase @Inject constructor(
     operator fun invoke(query: String, page: String): Flow<UsersState> =
         callbackFlow {
             val users = githubRepository.search(query, page)
-            val dbUsers = githubUserDBRepository.getAllUsers()
+            val dbUsers = githubUserDBRepository.getAllGithubUsers()
 
             users.combine(dbUsers) { _users, _dbUsers ->
                 when (_users) {
                     is Resource.Success -> {
                         _users.data?.items?.forEach { user ->
-                            user.favorite = _dbUsers.find { it.userId == user.id } != null
+                            user.favorite = _dbUsers.find { it.userId == user.id }?.let {
+                                it.isFav
+                            } ?: kotlin.run { false }
                         }
                         if (_users.data?.items?.isEmpty() == true) {
                             UsersState.NotFoundUsers
