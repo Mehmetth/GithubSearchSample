@@ -1,6 +1,5 @@
 package com.mehmetpetek.githubsample.ui.userdetail
 
-import android.util.Log
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.mehmetpetek.githubsample.R
