@@ -124,7 +124,7 @@ class HomeFragment :
                     currentList.addAll(userList)
                     (binding.rvUsers.adapter as UsersAdapter).submitList(currentList)
                 } else {
-                    (binding.rvUsers.adapter as UsersAdapter).notifyItemChanged(index)
+                    (binding.rvUsers.adapter as UsersAdapter).updateFavIcon(index)
                 }
             }
 

@@ -46,7 +46,8 @@ class HomeViewModel @Inject constructor(
                                 totalCount = it.searchResponse?.total_count,
                                 usersList = it.searchResponse?.items,
                                 searchQuery = userName,
-                                page = page
+                                page = page,
+                                changeIconIndex = -1
                             )
                         }
                     }
@@ -54,7 +55,8 @@ class HomeViewModel @Inject constructor(
                         setState {
                             getCurrentState().copy(
                                 isLoading = false,
-                                usersList = emptyList()
+                                usersList = emptyList(),
+                                changeIconIndex = -1
                             )
                         }
                     }

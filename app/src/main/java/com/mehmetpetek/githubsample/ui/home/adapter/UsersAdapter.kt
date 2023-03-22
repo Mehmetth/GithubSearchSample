@@ -36,6 +36,11 @@ class UsersAdapter(
         holder.bindData(currentList[position])
     }
 
+    fun updateFavIcon(index: Int) {
+        currentList[index].favorite = !(currentList[index].favorite)
+        notifyItemChanged(index)
+    }
+
     class UsersViewHolder(
         private val binding: RvUserItemBinding,
         private val onUserListener: OnUserListener,
@@ -46,6 +51,7 @@ class UsersAdapter(
         ) {
             binding.ivUserIcon.setImage(user.avatar_url, ScaleType.CENTER_INSIDE)
             binding.tvUserName.text = user.login
+
             binding.ivFavIcon.setImageResource(if (user.favorite) R.drawable.ic_favorite else R.drawable.ic_unfavorite)
 
             binding.ivFavIcon.setOnClickListener {
